@@ -1,0 +1,25 @@
+# Зависимости (самое важное)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Отчеты о тестировании (Cucumber HTML Reports)
+cucumber_report.html
+cucumber_report.json
+reports/
+test-results/
+
+# Скриншоты и логи ошибок
+screenshots/
+logs/
+*.log
+
+# Файлы операционной системы и редакторов
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+
+# Временные файлы Puppeteer и кэш
+.cache/
+.npm/
