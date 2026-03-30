@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const chai = require("chai");
 const expect = chai.expect;
 const { Given, When, Then, Before, After } = require("cucumber");
-const { putText, getText } = require("../../lib/commands.js");
+const { clickElement, getText, selectSeats } = require("../../lib/commands.js");
 
 Before(async function () {
   const browser = await puppeteer.launch({ headless: false, slowMo: 50 });
@@ -19,7 +19,7 @@ After(async function () {
 
 
 Given('user is on the cinema home page', async function () {
-  await this.page.goto("https://tmweb.ru");
+  await this.page.goto("https://qamid.tmweb.ru/client/index.php");
 });
 
 When('user selects day {string}', async function (dayIndex) {
@@ -36,12 +36,12 @@ When('user selects single seat: row {int}, chair {int}', async function (row, co
   await clickElement(this.page, seatSelector);
 });
 
-When('user selects multiple seats: 10/9, 5/6, 3/7', async function () {
-  const mySeats = [
-    { row: 10, col: 9 },
-    { row: 5, col: 6 },
-    { row: 3, col: 7 }
-  ];
+When('user selects multiple seats: {string}', async function (seatsString) {
+  const mySeats = seatsString.split(',').map(seat => {
+    const [row, col] = seat.trim().split('/');
+    return { row: parseInt(row), col: parseInt(col) };
+  });
+
   await selectSeats(this.page, mySeats);
 });
 
@@ -58,11 +58,15 @@ Then('the ticket should contain seat {string}', async function (expectedSeat) {
   expect(actual).to.contain(expectedSeat);
 });
 
-Then('the ticket should contain all seats: {string}, {string}, {string}', async function (s1, s2, s3) {
+Then('the ticket should contain all seats: {string}', async function (allSeats) {
+  await this.page.waitForSelector(".ticket__details.ticket__chairs", { visible: true });
+  
   const actual = await getText(this.page, ".ticket__details.ticket__chairs");
-  expect(actual).to.contain(s1);
-  expect(actual).to.contain(s2);
-  expect(actual).to.contain(s3);
+  const expectedSeats = allSeats.split(',').map(s => s.trim());
+
+  expectedSeats.forEach(seat => {
+    expect(actual).to.contain(seat);
+  });
 });
 
 Then('the booking button should be disabled', async function () {

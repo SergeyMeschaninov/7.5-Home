@@ -1,5 +1,4 @@
 const { clickElement, selectSeats, getText } = require("./lib/commands.js");
-const { generateName } = require("./lib/util.js");
 
 let page;
 
